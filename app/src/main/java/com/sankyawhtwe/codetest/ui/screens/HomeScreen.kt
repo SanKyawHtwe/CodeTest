@@ -1,6 +1,7 @@
 package com.sankyawhtwe.codetest.ui.screens
 
 import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -134,6 +135,7 @@ fun HomeScreen(
     }
     if (productUiState is ProductUiState.Error){
         Toast.makeText(LocalContext.current,"Something went wrong",Toast.LENGTH_SHORT).show()
+        Log.d("ErrorMessage", productUiState.message)
     }
 }
 

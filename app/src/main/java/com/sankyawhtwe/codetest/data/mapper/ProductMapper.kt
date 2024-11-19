@@ -1,15 +1,14 @@
 package com.sankyawhtwe.codetest.data.mapper
 
-import com.sankyawhtwe.codetest.data.model.ProductListResponse
+import com.sankyawhtwe.codetest.data.model.ProductResponse
 import com.sankyawhtwe.codetest.domain.model.ProductModel
 
-fun ProductListResponse.toProductModel(): List<ProductModel> = this.products.map {
+fun ProductResponse.toProductModel(): ProductModel =
     ProductModel(
-        id = it.id,
-        title = it.title.orEmpty(),
-        price = it.price ?: 0.00,
-        category = it.category.orEmpty(),
-        description = it.description.orEmpty(),
-        image = it.image.orEmpty()
+        id = this.id,
+        title = this.title.orEmpty(),
+        price = this.price ?: 0.00,
+        category = this.category.orEmpty(),
+        description = this.description.orEmpty(),
+        image = this.image.orEmpty()
     )
-}
