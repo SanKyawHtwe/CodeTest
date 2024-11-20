@@ -25,7 +25,7 @@ class ProductViewModel(
 
     var categoryUiState: StateFlow<CategoryUiState> = _categoryUiState
 
-    private fun getProductList() {
+    fun getProductList() {
         viewModelScope.launch {
             _productUiState.value = ProductUiState.Loading
             productRepository.getProductList().fold(

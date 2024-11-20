@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +23,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -89,7 +84,6 @@ fun NavGraphBuilder.homeScreen(
     }
 }
 
-
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -99,11 +93,9 @@ fun HomeScreen(
     onProductClick: (Int) -> Unit
 ) {
 
-
     Scaffold(
         modifier = modifier,
     ) { contentPadding ->
-
 
         val orientation = LocalConfiguration.current.orientation
         var expanded by remember { mutableStateOf(false) }
@@ -139,9 +131,16 @@ fun HomeScreen(
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {
-                        if (categoryUiState is CategoryUiState.Success) {
+                        if (categoryUiState is CategoryUiState.Success && productUiState is ProductUiState.Success) {
                             val categoryList = categoryUiState.categories
 
+                            DropdownMenuItem(
+                                text = { Text("all")},
+                                onClick = {
+                                    viewModel.getProductList()
+                                    expanded = false
+                                }
+                            )
                             repeat(categoryList.size) { index ->
                                 DropdownMenuItem(
                                     text = { Text(categoryList[index]) },
