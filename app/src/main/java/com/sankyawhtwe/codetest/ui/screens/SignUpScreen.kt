@@ -23,40 +23,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.sankyawhtwe.codetest.ui.theme.CodeTestTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object LoginRoute
+data object SignUpRoute
 
-fun NavGraphBuilder.loginScreen(
-    onLogin: () -> Unit,
-    onSignUpCLick: () -> Unit
+fun NavGraphBuilder.signUpScreen(
+    onSignup: () -> Unit
 ) {
-    composable<LoginRoute> {
-        LoginScreen(
-            onLogin = onLogin,
-            onSignUpCLick = onSignUpCLick
+    composable<SignUpRoute> {
+        SignUpScreen(
+            onSignup = onSignup
         )
     }
 }
 
+fun NavController.navigateToSignUpScreen() {
+    navigate(SignUpRoute)
+}
+
 @Composable
-fun LoginScreen(
+fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onLogin: () -> Unit,
-    onSignUpCLick: () -> Unit
+    onSignup: () -> Unit
 ) {
     Scaffold { contentPadding ->
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(contentPadding)
-        ) {
+        Box(modifier = modifier.padding(contentPadding)) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -106,37 +102,11 @@ fun LoginScreen(
                 Button(
                     modifier = Modifier
                         .padding(bottom = 16.dp),
-                    onClick = onLogin
+                    onClick = onSignup
                 ) {
-                    Text("Login")
-                }
-                Row(
-                    modifier = Modifier
-                        .padding(bottom = 16.dp)
-                ) {
-                    Text(text = "Don't have an account?")
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        modifier = Modifier.clickable(
-                            onClick = onSignUpCLick
-                        ),
-                        text = "Sign Up",
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                    )
+                    Text("Sign Up")
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview() {
-    CodeTestTheme {
-        LoginScreen(
-            onLogin = {},
-            onSignUpCLick = {}
-        )
-
     }
 }
