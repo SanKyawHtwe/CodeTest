@@ -176,7 +176,7 @@ fun Product(
             modifier = Modifier.wrapContentWidth(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            text = "$ 100.0"
+            text = "$ ${product.price}"
         )
     }
 }
