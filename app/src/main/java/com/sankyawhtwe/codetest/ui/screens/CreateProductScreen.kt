@@ -66,20 +66,6 @@ fun NavGraphBuilder.createProductScreen(
             onProductCreate = { viewModel.createProduct() }
         )
 
-//        val cameraLauncher =
-//            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-//                if (it.resultCode == Activity.RESULT_OK) {
-//                    imageUtils.currentPhotoUri?.let {
-//                        viewModel.addImage(it)
-//                    }
-//                }
-//            }
-//        val photoPickerLauncher =
-//            rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-//                uri?.let {
-//                    viewModel.addImage(it)
-//                }
-//            }
     }
 }
 
