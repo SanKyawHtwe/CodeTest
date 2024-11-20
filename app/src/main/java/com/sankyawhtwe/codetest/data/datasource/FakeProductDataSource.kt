@@ -63,4 +63,8 @@ class FakeProductDataSource :ProductRemoteDataSource{
         TODO("Not yet implemented")
     }
 
+    override suspend fun getProductDetails(id: Int): Result<ProductModel> {
+        TODO("Not yet implemented")
+    }
+
 }

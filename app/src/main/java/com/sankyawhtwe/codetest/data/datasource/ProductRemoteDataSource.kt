@@ -9,4 +9,6 @@ interface ProductRemoteDataSource {
     suspend fun getCategories(): Result<List<String>>
 
     suspend fun getProductsByCategory(category: String): Result<List<ProductModel>>
+
+    suspend fun getProductDetails(id: Int): Result<ProductModel>
 }

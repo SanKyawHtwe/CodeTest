@@ -33,4 +33,12 @@ class ProductRemoteDataSourceImpl(private val httpClient: HttpClient) : ProductR
             }
         }
     }
+
+    override suspend fun getProductDetails(id: Int): Result<ProductModel> {
+        return handle<ProductResponse> {
+            httpClient.get("https://fakestoreapi.com/products/$id")
+        }.map {
+            it.toProductModel()
+        }
+    }
 }

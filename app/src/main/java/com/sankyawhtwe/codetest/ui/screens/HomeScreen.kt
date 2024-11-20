@@ -3,18 +3,23 @@ package com.sankyawhtwe.codetest.ui.screens
 import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -69,7 +74,9 @@ fun NavController.navigateToHomeScreen(
     navigate(HomeRoute, navOptions = navOptions)
 }
 
-fun NavGraphBuilder.homeScreen() {
+fun NavGraphBuilder.homeScreen(
+    onProductClick: (Int) -> Unit
+) {
     composable<HomeRoute> {
         val viewModel: ProductViewModel = koinViewModel()
         val productUiState = viewModel.productUiState.collectAsStateWithLifecycle()
@@ -77,6 +84,7 @@ fun NavGraphBuilder.homeScreen() {
         HomeScreen(
             productUiState = productUiState.value,
             categoryUiState = categoryUiState.value,
+            onProductClick = onProductClick
         )
     }
 }
@@ -87,7 +95,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     productUiState: ProductUiState,
     categoryUiState: CategoryUiState,
-    viewModel : ProductViewModel = koinViewModel()
+    viewModel: ProductViewModel = koinViewModel(),
+    onProductClick: (Int) -> Unit
 ) {
 
 
@@ -107,12 +116,13 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Box(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(start = 16.dp)
                 ) {
                     IconButton(
                         modifier = Modifier
-                            .padding(end = 16.dp, top = 8.dp),
+                            .padding(top = 8.dp),
                         onClick = {
                             expanded = true
                         }
@@ -146,15 +156,14 @@ fun HomeScreen(
                 }
 
                 if (productUiState is ProductUiState.Success) {
-                    LazyVerticalGrid(
+                    LazyVerticalStaggeredGrid(
                         modifier = Modifier
                             .fillMaxWidth(),
                         contentPadding = PaddingValues(12.dp),
-                        columns = GridCells.Fixed(
+                        columns = StaggeredGridCells.Fixed(
                             if (orientation == Configuration.ORIENTATION_PORTRAIT) 2 else 4
                         ),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         val productList = productUiState.products
                         items(
@@ -162,7 +171,8 @@ fun HomeScreen(
                             key = { productList[it].id }
                         ) { index ->
                             Product(
-                                product = productList[index]
+                                product = productList[index],
+                                onProductClick = onProductClick
                             )
                         }
                     }
@@ -204,29 +214,24 @@ fun HomeScreen(
 @Composable
 fun Product(
     modifier: Modifier = Modifier,
-    product: ProductModel
+    product: ProductModel,
+    onProductClick: (Int) -> Unit
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
+            .clickable {
+                onProductClick(product.id)
+            }
     ) {
         AsyncImage(
             modifier = Modifier
-                .aspectRatio(473 / 676f)
                 .clip(RoundedCornerShape(16.dp)),
             model = product.image,
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
             contentDescription = null
         )
-//        Image(
-//            modifier = Modifier
-//                .aspectRatio(473 / 676f)
-//                .clip(RoundedCornerShape(16.dp)),
-//            contentScale = ContentScale.Crop,
-//            painter = painterResource(R.drawable.ic_launcher_background),
-//            contentDescription = null
-//        )
         Text(
             modifier = Modifier.wrapContentWidth(),
             maxLines = 1,
@@ -239,6 +244,7 @@ fun Product(
             overflow = TextOverflow.Ellipsis,
             text = "$ ${product.price}"
         )
+        Spacer(modifier = Modifier.size(8.dp))
     }
 }
 
@@ -287,7 +293,8 @@ private fun HomeScreenPreview() {
                 categories = listOf(
                     "All"
                 )
-            )
+            ),
+            onProductClick = {}
         )
     }
 }
