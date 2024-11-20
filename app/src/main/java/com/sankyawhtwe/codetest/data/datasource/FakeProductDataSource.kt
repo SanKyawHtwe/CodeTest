@@ -49,4 +49,18 @@ class FakeProductDataSource :ProductRemoteDataSource{
             )
         )
     }
+
+    override suspend fun getCategories(): Result<List<String>> {
+        return  Result.success(listOf(
+            "electronics",
+            "jewelery",
+            "men's clothing",
+            "women's clothing"
+        ))
+    }
+
+    override suspend fun getProductsByCategory(category: String): Result<List<ProductModel>> {
+        TODO("Not yet implemented")
+    }
+
 }

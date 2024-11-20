@@ -17,4 +17,20 @@ class ProductRemoteDataSourceImpl(private val httpClient: HttpClient) : ProductR
             }
         }
     }
+
+    override suspend fun getCategories(): Result<List<String>> {
+        return handle<List<String>> {
+            httpClient.get("https://fakestoreapi.com/products/categories")
+        }
+    }
+
+    override suspend fun getProductsByCategory(category: String): Result<List<ProductModel>> {
+        return handle<List<ProductResponse>> {
+            httpClient.get("https://fakestoreapi.com/products/category/$category")
+        }.map {
+            it.map { productResponse ->
+                productResponse.toProductModel()
+            }
+        }
+    }
 }
