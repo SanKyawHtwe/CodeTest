@@ -8,7 +8,6 @@ import com.sankyawhtwe.codetest.di.productViewModelModule
 import org.koin.core.context.startKoin
 
 class ProductApplication: Application() {
-
     override fun onCreate() {
         super.onCreate()
         startKoin{

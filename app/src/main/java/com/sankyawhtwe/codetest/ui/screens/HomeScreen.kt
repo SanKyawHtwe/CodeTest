@@ -70,7 +70,8 @@ fun NavController.navigateToHomeScreen(
 }
 
 fun NavGraphBuilder.homeScreen(
-    onProductClick: (Int) -> Unit
+    onProductClick: (Int) -> Unit,
+    onAddProduct: () -> Unit
 ) {
     composable<HomeRoute> {
         val viewModel: ProductViewModel = koinViewModel()
@@ -79,7 +80,8 @@ fun NavGraphBuilder.homeScreen(
         HomeScreen(
             productUiState = productUiState.value,
             categoryUiState = categoryUiState.value,
-            onProductClick = onProductClick
+            onProductClick = onProductClick,
+            onAddProduct = onAddProduct
         )
     }
 }
@@ -90,7 +92,8 @@ fun HomeScreen(
     productUiState: ProductUiState,
     categoryUiState: CategoryUiState,
     viewModel: ProductViewModel = koinViewModel(),
-    onProductClick: (Int) -> Unit
+    onProductClick: (Int) -> Unit,
+    onAddProduct:()->Unit
 ) {
 
     Scaffold(
@@ -135,7 +138,7 @@ fun HomeScreen(
                             val categoryList = categoryUiState.categories
 
                             DropdownMenuItem(
-                                text = { Text("all")},
+                                text = { Text("all") },
                                 onClick = {
                                     viewModel.getProductList()
                                     expanded = false
@@ -181,7 +184,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(24.dp),
-                onClick = {},
+                onClick = onAddProduct,
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -226,9 +229,10 @@ fun Product(
     ) {
         AsyncImage(
             modifier = Modifier
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp)),
             model = product.image,
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.Crop,
             contentDescription = null
         )
         Text(
@@ -293,7 +297,8 @@ private fun HomeScreenPreview() {
                     "All"
                 )
             ),
-            onProductClick = {}
+            onProductClick = {},
+            onAddProduct = {}
         )
     }
 }

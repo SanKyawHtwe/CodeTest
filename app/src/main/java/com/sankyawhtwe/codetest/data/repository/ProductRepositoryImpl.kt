@@ -21,4 +21,8 @@ class ProductRepositoryImpl(
     override suspend fun getProductDetails(id: Int): Result<ProductModel> {
         return productRemoteDataSource.getProductDetails(id = id)
     }
+
+    override suspend fun createProduct(): Result<Unit> {
+        return productRemoteDataSource.createProduct()
+    }
 }

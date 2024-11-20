@@ -6,6 +6,7 @@ import com.sankyawhtwe.codetest.domain.model.ProductModel
 import com.sci.coffeeandroid.feature.menudetails.data.utils.handle
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 
 class ProductRemoteDataSourceImpl(private val httpClient: HttpClient) : ProductRemoteDataSource {
     override suspend fun getProductList(): Result<List<ProductModel>> {
@@ -39,6 +40,12 @@ class ProductRemoteDataSourceImpl(private val httpClient: HttpClient) : ProductR
             httpClient.get("https://fakestoreapi.com/products/$id")
         }.map {
             it.toProductModel()
+        }
+    }
+
+    override suspend fun createProduct(): Result<Unit> {
+        return handle<Unit> {
+            httpClient.post("https://fakestoreapi.com/products")
         }
     }
 }

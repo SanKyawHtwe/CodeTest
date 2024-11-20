@@ -10,4 +10,6 @@ interface ProductRepository {
     suspend fun getProductsByCategory(category: String): Result<List<ProductModel>>
 
     suspend fun getProductDetails(id: Int): Result<ProductModel>
+
+    suspend fun createProduct() :Result<Unit>
 }
