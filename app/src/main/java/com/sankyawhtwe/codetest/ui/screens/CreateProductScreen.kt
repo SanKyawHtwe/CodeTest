@@ -1,6 +1,8 @@
 package com.sankyawhtwe.codetest.ui.screens
 
 import android.graphics.Paint.Align
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -23,6 +27,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,7 +39,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.key.Key.Companion.G
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,10 +51,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.ui.theme.CodeTestTheme
 import com.sankyawhtwe.codetest.ui.viewmodel.CategoryUiState
 import com.sankyawhtwe.codetest.ui.viewmodel.CreateProductUiState
 import com.sankyawhtwe.codetest.ui.viewmodel.CreateProductViewModel
+import com.sankyawhtwe.codetest.ui.viewmodel.ProductUiState
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -54,6 +64,7 @@ import org.koin.androidx.compose.koinViewModel
 data object CreateProductRoute
 
 fun NavGraphBuilder.createProductScreen(
+    onProductCreated: () -> Unit
 ) {
     composable<CreateProductRoute> {
         val viewModel: CreateProductViewModel = koinViewModel()
@@ -63,7 +74,13 @@ fun NavGraphBuilder.createProductScreen(
         CreateProductScreen(
             createProductUiState = createProductUiState.value,
             categoryUiState = categoryUiState.value,
-            onProductCreate = { viewModel.createProduct() }
+            onProductCreate = { newProduct ->
+                viewModel.createProduct(newProduct)
+            },
+            onProductCreated = {
+                viewModel.clearCreateProductState()
+                onProductCreated()
+            }
         )
 
     }
@@ -79,10 +96,11 @@ fun CreateProductScreen(
     modifier: Modifier = Modifier,
     createProductUiState: CreateProductUiState,
     categoryUiState: CategoryUiState,
-    onProductCreate: () -> Unit
+    onProductCreate: (ProductRequest) -> Unit,
+    onProductCreated: () -> Unit
 ) {
     Scaffold() { contentPadding ->
-        Box(modifier = Modifier.padding(contentPadding)) {
+        Box(modifier = modifier.padding(contentPadding)) {
             var title by rememberSaveable { mutableStateOf("") }
             var price by rememberSaveable { mutableStateOf("") }
             var description by rememberSaveable { mutableStateOf("") }
@@ -94,8 +112,6 @@ fun CreateProductScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-
-
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = title,
@@ -115,6 +131,9 @@ fun CreateProductScreen(
                     onValueChange = {
                         price = it
                     },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number
+                    )
                 )
                 Spacer(modifier = Modifier.size(12.dp))
                 TextField(
@@ -136,6 +155,9 @@ fun CreateProductScreen(
                     onValueChange = {
                         imageLink = it
                     },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Uri
+                    )
                 )
                 Spacer(modifier = Modifier.size(12.dp))
 
@@ -185,31 +207,53 @@ fun CreateProductScreen(
                             }
                         }
                     }
-                }
-
-            }
-            var isSubmitting by remember { mutableStateOf(false) }
-            Button(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
-                onClick = {
-                    if (
-                        title.isNotEmpty()
-                        && price.isNotEmpty()
-                        && description.isNotEmpty()
-                        && imageLink.isNotEmpty()
-                    ) {
-                        isSubmitting = true
-                        onProductCreate()
-                        isSubmitting = false
+                    if (createProductUiState is CreateProductUiState.Success) {
+                        Toast.makeText(LocalContext.current, "Product created", Toast.LENGTH_SHORT).show()
                     }
-                },
-                enabled = !isSubmitting
-            ) {
-                Text(if (isSubmitting) "Submitting..." else "Create Product")
+
+                    Button(
+                        modifier = Modifier
+                            .padding(bottom = 16.dp),
+                        onClick = {
+                            if (
+                                title.isNotEmpty()
+                                && price.isNotEmpty()
+                                && description.isNotEmpty()
+                                && imageLink.isNotEmpty()
+                            ) {
+                                onProductCreate(
+                                    ProductRequest(
+                                        title = title,
+                                        price = price.toDouble(),
+                                        description = description,
+                                        image = imageLink,
+                                        category = selectedOptionText
+                                    )
+                                )
+
+                            }
+                        },
+                    ) {
+                        Text("Create Product")
+                    }
+                }
             }
         }
+    }
+    if (createProductUiState is CreateProductUiState.Loading) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .width(64.dp)
+                    .align(Alignment.Center),
+                color = MaterialTheme.colorScheme.secondary,
+                strokeCap = StrokeCap.Butt,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        }
+    }
+    if (createProductUiState is CreateProductUiState.Error) {
+        Toast.makeText(LocalContext.current, "Something went wrong", Toast.LENGTH_SHORT).show()
     }
 }
 

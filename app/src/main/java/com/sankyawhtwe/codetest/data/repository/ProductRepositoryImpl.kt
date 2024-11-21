@@ -1,6 +1,7 @@
 package com.sankyawhtwe.codetest.data.repository
 
 import com.sankyawhtwe.codetest.data.datasource.ProductRemoteDataSource
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.domain.model.ProductModel
 
 class ProductRepositoryImpl(
@@ -22,7 +23,7 @@ class ProductRepositoryImpl(
         return productRemoteDataSource.getProductDetails(id = id)
     }
 
-    override suspend fun createProduct(): Result<Unit> {
-        return productRemoteDataSource.createProduct()
+    override suspend fun createProduct(newProduct: ProductRequest): Result<Unit> {
+        return productRemoteDataSource.createProduct(newProduct = newProduct)
     }
 }

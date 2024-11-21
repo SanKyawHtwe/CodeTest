@@ -2,6 +2,7 @@ package com.sankyawhtwe.codetest.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.data.repository.ProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +14,7 @@ class CreateProductViewModel(
 
     private val _createProductUiState: MutableStateFlow<CreateProductUiState> =
         MutableStateFlow(
-            CreateProductUiState.Loading
+            CreateProductUiState.Idle
         )
 
     var createProductUiState: StateFlow<CreateProductUiState> = _createProductUiState
@@ -24,10 +25,10 @@ class CreateProductViewModel(
 
     var categoryUiState: StateFlow<CategoryUiState> = _categoryUiState
 
-    fun createProduct() {
+    fun createProduct(newProduct: ProductRequest) {
         viewModelScope.launch {
             _createProductUiState.value = CreateProductUiState.Loading
-            productRepository.createProduct().fold(
+            productRepository.createProduct(newProduct = newProduct).fold(
                 {
                     _createProductUiState.value = CreateProductUiState.Success
                 },
@@ -55,12 +56,17 @@ class CreateProductViewModel(
         }
     }
 
+    fun clearCreateProductState(){
+        _createProductUiState.value = CreateProductUiState.Idle
+    }
+
     init {
         getCategories()
     }
 }
 
 sealed class CreateProductUiState {
+    data object Idle: CreateProductUiState()
     data object Loading : CreateProductUiState()
     data object Success : CreateProductUiState()
     data class Error(val message: String) : CreateProductUiState()

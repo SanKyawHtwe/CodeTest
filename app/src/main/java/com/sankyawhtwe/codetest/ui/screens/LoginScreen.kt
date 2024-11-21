@@ -25,22 +25,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.sankyawhtwe.codetest.ui.theme.CodeTestTheme
+import com.sankyawhtwe.codetest.ui.viewmodel.LoginUiState
+import com.sankyawhtwe.codetest.ui.viewmodel.LoginViewModel
 import kotlinx.serialization.Serializable
+import org.koin.androidx.compose.koinViewModel
 
 @Serializable
 data object LoginRoute
 
 fun NavGraphBuilder.loginScreen(
-    onLogin: () -> Unit,
+    onLoginSuccess: () -> Unit,
     onSignUpCLick: () -> Unit
 ) {
     composable<LoginRoute> {
+        val viewModel: LoginViewModel = koinViewModel()
+        val uiState = viewModel.loginUiState.collectAsStateWithLifecycle()
         LoginScreen(
-            onLogin = onLogin,
-            onSignUpCLick = onSignUpCLick
+            onLogin = viewModel::logIn,
+            onSignUpCLick = onSignUpCLick,
+            uiState = uiState.value,
+            onLoginSuccess = onLoginSuccess
         )
     }
 }
@@ -48,22 +56,28 @@ fun NavGraphBuilder.loginScreen(
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    onLogin: () -> Unit,
+    uiState: LoginUiState,
+    onLoginSuccess: () -> Unit,
+    onLogin: (String, String) -> Unit,
     onSignUpCLick: () -> Unit
 ) {
+    if (uiState is LoginUiState.Success) {
+        onLoginSuccess()
+    }
     Scaffold { contentPadding ->
         Box(
             modifier = modifier
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
+
+            var email by rememberSaveable { mutableStateOf("") }
+            var password by rememberSaveable { mutableStateOf("") }
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                var email by rememberSaveable { mutableStateOf("") }
-                var password by rememberSaveable { mutableStateOf("") }
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -106,7 +120,11 @@ fun LoginScreen(
                 Button(
                     modifier = Modifier
                         .padding(bottom = 16.dp),
-                    onClick = onLogin
+                    onClick = {
+                        onLogin(
+                            email, password
+                        )
+                    }
                 ) {
                     Text("Login")
                 }
@@ -129,14 +147,14 @@ fun LoginScreen(
     }
 }
 
-@Preview
-@Composable
-private fun Preview() {
-    CodeTestTheme {
-        LoginScreen(
-            onLogin = {},
-            onSignUpCLick = {}
-        )
-
-    }
-}
+//@Preview
+//@Composable
+//private fun Preview() {
+//    CodeTestTheme {
+//        LoginScreen(
+//            onLogin = {},
+//            onSignUpCLick = {}
+//        )
+//
+//    }
+//}

@@ -1,5 +1,6 @@
 package com.sankyawhtwe.codetest.data.datasource
 
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.domain.model.ProductModel
 
 interface ProductRemoteDataSource {
@@ -12,5 +13,5 @@ interface ProductRemoteDataSource {
 
     suspend fun getProductDetails(id: Int): Result<ProductModel>
 
-    suspend fun createProduct() :Result<Unit>
+    suspend fun createProduct(newProduct: ProductRequest) :Result<Unit>
 }

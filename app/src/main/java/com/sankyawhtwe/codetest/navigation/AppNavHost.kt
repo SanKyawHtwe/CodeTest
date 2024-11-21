@@ -3,7 +3,7 @@ package com.sankyawhtwe.codetest.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.sankyawhtwe.codetest.ui.screens.LoginRoute
+import com.sankyawhtwe.codetest.ui.screens.HomeRoute
 import com.sankyawhtwe.codetest.ui.screens.createProductScreen
 import com.sankyawhtwe.codetest.ui.screens.homeScreen
 import com.sankyawhtwe.codetest.ui.screens.loginScreen
@@ -20,7 +20,7 @@ fun AppNavHost(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = LoginRoute
+        startDestination = HomeRoute
     ) {
         homeScreen(
             onProductClick = {
@@ -31,9 +31,13 @@ fun AppNavHost(
             }
         )
         productDetailsScreen(onNavigateUp = navController::navigateUp)
-        createProductScreen()
+        createProductScreen(
+            onProductCreated = {
+                navController.navigateToHomeScreen()
+            }
+        )
         loginScreen(
-            onLogin = {
+            onLoginSuccess = {
                 navController.navigateToHomeScreen()
             },
             onSignUpCLick = {

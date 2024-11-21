@@ -1,5 +1,6 @@
 package com.sankyawhtwe.codetest.data.datasource
 
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.domain.model.ProductModel
 
 class FakeProductDataSource :ProductRemoteDataSource{
@@ -67,8 +68,9 @@ class FakeProductDataSource :ProductRemoteDataSource{
         TODO("Not yet implemented")
     }
 
-    override suspend fun createProduct(): Result<Unit> {
+    override suspend fun createProduct(newProduct: ProductRequest): Result<Unit> {
         TODO("Not yet implemented")
     }
+
 
 }

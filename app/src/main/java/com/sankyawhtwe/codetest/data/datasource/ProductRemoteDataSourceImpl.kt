@@ -1,12 +1,16 @@
 package com.sankyawhtwe.codetest.data.datasource
 
 import com.sankyawhtwe.codetest.data.mapper.toProductModel
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.data.model.ProductResponse
 import com.sankyawhtwe.codetest.domain.model.ProductModel
 import com.sci.coffeeandroid.feature.menudetails.data.utils.handle
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 class ProductRemoteDataSourceImpl(private val httpClient: HttpClient) : ProductRemoteDataSource {
     override suspend fun getProductList(): Result<List<ProductModel>> {
@@ -43,9 +47,21 @@ class ProductRemoteDataSourceImpl(private val httpClient: HttpClient) : ProductR
         }
     }
 
-    override suspend fun createProduct(): Result<Unit> {
+    override suspend fun createProduct(newProduct: ProductRequest): Result<Unit> {
         return handle<Unit> {
-            httpClient.post("https://fakestoreapi.com/products")
+            httpClient.post("https://fakestoreapi.com/products"){
+                contentType(ContentType.Application.Json)
+                setBody(
+                    newProduct
+//                    mapOf(
+//                        "title" to newProduct.title,
+//                        "price" to newProduct.price,
+//                        "description" to newProduct.description,
+//                        "image" to newProduct.image,
+//                        "category" to newProduct.category
+//                    )
+                )
+            }
         }
     }
 }

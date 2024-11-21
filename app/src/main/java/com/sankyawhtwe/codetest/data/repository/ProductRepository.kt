@@ -1,5 +1,6 @@
 package com.sankyawhtwe.codetest.data.repository
 
+import com.sankyawhtwe.codetest.data.model.ProductRequest
 import com.sankyawhtwe.codetest.domain.model.ProductModel
 
 interface ProductRepository {
@@ -11,5 +12,5 @@ interface ProductRepository {
 
     suspend fun getProductDetails(id: Int): Result<ProductModel>
 
-    suspend fun createProduct() :Result<Unit>
+    suspend fun createProduct(newProduct:ProductRequest) :Result<Unit>
 }
